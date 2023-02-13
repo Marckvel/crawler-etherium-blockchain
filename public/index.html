@@ -1,0 +1,191 @@
+<html>
+<head>
+    <link rel="shortcut icon" href="#">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,700;1,100;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        form {
+            background: rgb(255, 255, 255);
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            box-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px 0;
+            width: 500px;
+            padding: 20px;
+        }
+
+        form>input[type="text"] {
+            display: block;
+            background: #efefef;
+            border: 1px solid #ccc;
+            margin: 10px auto;
+            width: 100%;
+            padding: 15px 10px;
+        }
+
+        form>input[type="submit"] {
+            display: block;
+            background: #efefef;
+            border: 1px solid #ccc;
+            margin: 10px auto;
+            width: 100%;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        form>input[type="submit"]:hover {
+            background: #bababa;
+        }
+
+        table {
+            width: 700px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-left: 0;
+            background: #f6f6f6;
+            border-collapse: separate;
+            border-spacing: 0;
+            box-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px 0;
+        }
+
+        thead>tr>th {
+            padding: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #dedede;
+            border-left: 1px solid #ccc;
+        }
+
+        tbody>tr>th {
+            font-size: 14px;
+            border-left: 1px solid #ccc;
+            padding: 15px 20px;
+        }
+
+        tbody>tr:nth-child(2n) {
+            background: #fff;
+        }
+    </style>
+    <script>
+
+        $(function () {
+
+            $("#timerequest").on("submit", function (e0) {
+                $.ajax({
+                    url: '/timebalance',
+                    type: 'get',
+                    data: $('#timerequest').serialize(),
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+
+                        /* let timeAmount = '';
+                        if (data.timeBalance.result.toString().length <= 18) {
+                            timeAmount = data.timeBalance.result / 1000000000000000000;
+                        }
+                        else
+                            timeAmount = data.timeBalance.result.replace(data.timeBalance.result.slice(-18), "").replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + data.timeBalance.result.slice(-18);
+
+                        let timeTokens = data.tokenTime.result;
+                        $("#timeresult").append("Tokens available at given time: " + timeTokens + " ,and ETH balance :" + timeAmount); */
+
+
+                    }
+                });
+                e0.preventDefault();
+            });
+        });
+
+
+        $(function () {
+
+            $("#request").on("submit", function (e1) {
+                var x = document.getElementById("adr").value;
+
+
+                $.ajax({
+                    url: '/tansactions',
+                    type: 'get',
+                    data: $('#request').serialize(),
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+
+                        //Important code starts here to populate table  
+
+                        jQuery.each(data.transactions.result, function (i, item) {
+                            let tWallet = '';
+                            let tFrom = '';
+                            let tAmount = '';
+                            if (data.transactions.result[i].from == x) {
+                                tWallet = data.transactions.result[i].to;
+                                tFrom = "Sent to";
+                            }
+                            else {
+                                tWallet = data.transactions.result[i].from;
+                                tFrom = "Received from";
+                            }
+
+                            if (data.transactions.result[i].value.toString().length <= 18) {
+                                tAmount = data.transactions.result[i].value / 1000000000000000000;
+                            }
+                            else
+                                tAmount = data.transactions.result[i].value.replace(data.transactions.result[i].value.slice(-18), "").replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + data.transactions.result[i].value.slice(-18);
+
+                            $("#result").append("<tr><td>" + tAmount + "</td><td>" + tFrom + "</td><td>" + tWallet + "</td></tr>");
+                        });
+                    }
+                });
+                e1.preventDefault();
+            });
+        });
+    </script>
+    <style>
+        th {
+            color: #fff;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <form id="timerequest">
+        <input type="text" id="start" name="time" placeholder="yyyy-mm-dd">
+        <p id="timeresult"></p>
+        <input type="submit" value="Submit">
+        
+    </form>
+
+
+    <form id="request">
+
+        <input type="text" id="adr" name="address" placeholder="Wallet address" />
+        <input type="text" name="endBlock" placeholder="End block" />
+        <input type="submit" value="Submit">
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr class="bg-info">
+                <th>Amount</th>
+                <th>Transfer</th>
+                <th>Associated Wallet</th>
+            </tr>
+        </thead>
+
+        <tbody id="result">
+
+        </tbody>
+    </table>
+</body>
+
+</html>
